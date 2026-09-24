@@ -308,6 +308,20 @@
 
     .ink-char.ink-space { min-width: 0.3em; }
 
+    /* 금박: 먹처럼 스며들지 않고 종이 위에 얹힌 금빛 광택 */
+    .ink-gold .ink-track { mix-blend-mode: normal; }
+
+    .ink-gold .ink-char {
+      color: transparent;
+      background-image: linear-gradient(165deg,
+        #7a5518 0%, #c9982f 22%, #f3d77a 38%, #fff3c4 46%,
+        #e2b54a 56%, #a8782a 74%, #6e4a14 100%);
+      -webkit-background-clip: text;
+      background-clip: text;
+      text-shadow: none;
+      filter: drop-shadow(0 1px 0 rgba(90, 58, 12, 0.55)) drop-shadow(0 0 3px rgba(255, 220, 130, 0.35));
+    }
+
     /* 마지막 글자 뒤 자간이 남으면 글귀가 왼쪽으로 쏠려 보입니다 */
     .ink-char:last-child { letter-spacing: 0; }
 
@@ -818,10 +832,15 @@
       var WRITE_HOLD_MS = 3200;
       var FADE_MS = 950;
 
-      // 먹 색: 먹 / 금니 두 가지만 씁니다.
+      // 먹 색: 먹 / 금박 두 가지만 씁니다.
       var INKS = {
         meok: { label: "먹", color: "#1a1714", bleed: "rgba(26, 23, 20, 0.22)" },
-        gold: { label: "금니", color: "#a8832c", bleed: "rgba(168, 131, 44, 0.25)" }
+        gold: {
+          label: "금박",
+          color: "#b8902f",
+          bleed: "rgba(120, 84, 20, 0.28)",
+          swatch: "linear-gradient(135deg, #8a6420, #f3d77a 45%, #fff3c4 55%, #b8862a)"
+        }
       };
 
       var FONT_FAMILIES = {
@@ -1407,7 +1426,7 @@
             sw.type = "button";
             sw.className = "ink-swatch";
             sw.dataset.ink = key;
-            sw.style.setProperty("--sw", INKS[key].color);
+            sw.style.setProperty("--sw", INKS[key].swatch || INKS[key].color);
             sw.innerHTML = "<i></i>";
             sw.appendChild(document.createTextNode(INKS[key].label));
             sw.addEventListener("click", function () {
@@ -1438,6 +1457,7 @@
         var ink = INKS[key] || INKS.meok;
         frame.style.setProperty("--ink", ink.color);
         frame.style.setProperty("--ink-bleed", ink.bleed);
+        frame.classList.toggle("ink-gold", key === "gold");
       }
 
       function fillInkSegment(segment, board) {
