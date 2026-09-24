@@ -1,0 +1,1664 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>한지 붓글씨판</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Nanum+Brush+Script&family=East+Sea+Dokdo&family=Song+Myung&family=Yeon+Sung&family=Gowun+Batang:wght@400;700&display=swap" rel="stylesheet">
+  <style>
+    @font-face {
+      font-family: 'JeonjuWanpanbonGak';
+      src: url('fonts/jeonju/JeonjuWanpanbonGak-R.ttf') format('truetype');
+      font-weight: 400;
+      font-style: normal;
+      font-display: swap;
+    }
+
+    @font-face {
+      font-family: 'JeonjuWanpanbonGak';
+      src: url('fonts/jeonju/JeonjuWanpanbonGak-L.ttf') format('truetype');
+      font-weight: 300;
+      font-style: normal;
+      font-display: swap;
+    }
+
+    :root {
+      --bg: #1c1a17;
+      --surface: #262320;
+      --surface-2: #151310;
+      --line: rgba(236, 224, 200, 0.1);
+      --text: #ece3d0;
+      --text-muted: #9a8f7c;
+      --accent: #c0392b;
+      --accent-soft: rgba(192, 57, 43, 0.18);
+      --chroma-color: #00b140;
+      --panel-w: 900px;
+      --panel-h: 160px;
+      --font-family: 'Nanum Brush Script';
+      --mount-color: #34503f;
+      --paper: #f4efe3;
+      --paper-edge: rgba(150, 120, 70, 0.28);
+      --write-dur: 0.6s;
+      --pad-x: 0px;
+      --pad-y: 0px;
+
+      /* 한지 질감: 고운 티끌 + 가로·세로 섬유 */
+      --grain: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' width='260' height='260'><filter id='g'><feTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='3' stitchTiles='stitch'/><feColorMatrix values='0 0 0 0 .42  0 0 0 0 .34  0 0 0 0 .22  0 0 0 1.1 -.55'/></filter><rect width='100%' height='100%' filter='url(%23g)'/></svg>");
+      --fiber-h: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' width='520' height='520'><filter id='f'><feTurbulence type='turbulence' baseFrequency='.006 .05' numOctaves='2' seed='4' stitchTiles='stitch'/><feColorMatrix values='0 0 0 0 .6  0 0 0 0 .52  0 0 0 0 .38  0 0 0 -16 .42'/></filter><rect width='100%' height='100%' filter='url(%23f)'/></svg>");
+      --fiber-v: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' width='480' height='480'><filter id='v'><feTurbulence type='turbulence' baseFrequency='.045 .007' numOctaves='2' seed='11' stitchTiles='stitch'/><feColorMatrix values='0 0 0 0 1  0 0 0 0 1  0 0 0 0 .96  0 0 0 -10 .9'/></filter><rect width='100%' height='100%' filter='url(%23v)'/></svg>");
+      --mottle: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' width='600' height='600'><filter id='m'><feTurbulence type='fractalNoise' baseFrequency='.012' numOctaves='3' seed='8' stitchTiles='stitch'/><feColorMatrix values='0 0 0 0 .6  0 0 0 0 .5  0 0 0 0 .32  0 0 0 .9 -.35'/></filter><rect width='100%' height='100%' filter='url(%23m)'/></svg>");
+    }
+
+    html.chroma-key,
+    body.chroma-key {
+      background: var(--chroma-color) !important;
+    }
+
+    body.chroma-key { padding: 0; }
+
+    body.chroma-key .main {
+      margin-left: 0;
+      padding: 0;
+    }
+
+    body.chroma-key .page-wrap {
+      padding: 0;
+      min-height: auto;
+      justify-content: flex-start;
+      align-items: flex-start;
+    }
+
+    body.chroma-key .chu-frame { filter: none; }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      min-height: 100vh;
+      font-family: "Gowun Batang", "Malgun Gothic", "Apple SD Gothic Neo", "Noto Serif KR", serif;
+      background:
+        radial-gradient(ellipse 70% 50% at 50% 0%, rgba(120, 96, 60, 0.18), transparent 70%),
+        var(--bg);
+      color: var(--text);
+    }
+
+    html.obs,
+    html.obs body,
+    body.obs {
+      width: max-content !important;
+      height: max-content !important;
+      min-height: 0 !important;
+      min-width: 0 !important;
+      margin: 0 !important;
+      padding: 0 !important;
+      overflow: hidden !important;
+      background: transparent !important;
+    }
+
+    body.obs .layout,
+    body.obs .main,
+    body.obs .page-wrap {
+      display: block !important;
+      width: max-content !important;
+      height: max-content !important;
+      min-height: 0 !important;
+      margin: 0 !important;
+      padding: 0 !important;
+    }
+
+    body.obs .signboard-stack {
+      width: var(--panel-w);
+      max-width: none;
+      gap: 0;
+    }
+
+    body.obs .signboard-stack .chu-frame + .chu-frame {
+      margin-top: 20px;
+    }
+
+    body.obs .chu-frame { filter: none; }
+
+    body.obs .admin-only,
+    body.obs .hint { display: none !important; }
+
+    .page-title {
+      font-family: 'Nanum Brush Script', serif;
+      font-size: clamp(2.4rem, 7vw, 3.2rem);
+      font-weight: normal;
+      letter-spacing: 0.02em;
+      margin-bottom: 0.5rem;
+      width: 100%;
+      max-width: var(--panel-w);
+      text-align: left;
+      color: var(--text);
+    }
+
+    .page-title .stamp {
+      display: inline-block;
+      margin-left: 0.4rem;
+      padding: 0.1rem 0.3rem;
+      font-family: 'Song Myung', serif;
+      font-size: 0.9rem;
+      vertical-align: middle;
+      color: #f4efe3;
+      background: var(--accent);
+      border-radius: 3px;
+      transform: rotate(-4deg);
+    }
+
+    .page-wrap {
+      width: 100%;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 1rem;
+    }
+
+    .signboard-stack {
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+      width: var(--panel-w);
+      max-width: 100%;
+    }
+
+    /* ── 표구(프레임) ───────────────────────── */
+    .chu-frame {
+      --ink: #1a1714;
+      --ink-bleed: rgba(26, 23, 20, 0.22);
+      position: relative;
+      width: 100%;
+      height: var(--panel-h);
+      padding: var(--pad-y) var(--pad-x);
+      filter: drop-shadow(0 10px 22px rgba(0, 0, 0, 0.45));
+    }
+
+    .chu-frame.frame-none {
+      --pad-x: 0px;
+      --pad-y: 0px;
+    }
+
+    /* 두루마리: 비단 표구 + 양 끝 나무 축 */
+    .chu-frame.frame-scroll {
+      --pad-x: 26px;
+      --pad-y: 12px;
+      background-color: var(--mount-color);
+      background-image:
+        linear-gradient(90deg, rgba(0, 0, 0, 0.18), transparent 12%, transparent 88%, rgba(0, 0, 0, 0.18)),
+        repeating-linear-gradient(45deg, rgba(255, 255, 255, 0.05) 0 2px, transparent 2px 6px),
+        repeating-linear-gradient(-45deg, rgba(0, 0, 0, 0.06) 0 2px, transparent 2px 6px);
+      border-radius: 2px;
+    }
+
+    .chu-frame.frame-scroll::before,
+    .chu-frame.frame-scroll::after {
+      content: "";
+      position: absolute;
+      top: 0;
+      bottom: 0;
+      width: 14px;
+      border-radius: 7px;
+      background:
+        linear-gradient(180deg, #2a1a10 0 7px, transparent 7px calc(100% - 7px), #2a1a10 calc(100% - 7px)),
+        linear-gradient(90deg, #3b2616, #8a5a33 35%, #b07a48 50%, #6b4424 70%, #2e1d10);
+      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.5);
+      z-index: 3;
+    }
+
+    .chu-frame.frame-scroll::before { left: 0; }
+    .chu-frame.frame-scroll::after { right: 0; }
+
+    /* 액자: 나무 테 + 속지 */
+    .chu-frame.frame-wood {
+      --pad-x: 16px;
+      --pad-y: 16px;
+      background:
+        linear-gradient(90deg, rgba(0, 0, 0, 0.25), transparent 6%, transparent 94%, rgba(0, 0, 0, 0.25)),
+        repeating-linear-gradient(90deg, rgba(255, 220, 170, 0.05) 0 1px, transparent 1px 7px),
+        linear-gradient(180deg, #5c3a21, #3d2515 50%, #2b190d);
+      border-radius: 3px;
+      box-shadow: inset 0 0 0 1px rgba(255, 210, 160, 0.15), inset 0 0 0 5px rgba(0, 0, 0, 0.2);
+    }
+
+    .chu-frame.frame-wood .chu-paper {
+      box-shadow:
+        0 0 0 3px #e9dfc9,
+        inset 0 0 20px var(--paper-edge);
+    }
+
+    /* ── 한지 ───────────────────────────── */
+    .chu-paper {
+      position: relative;
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+      background-color: var(--paper);
+      background-image: var(--fiber-v), var(--fiber-h), var(--grain), var(--mottle);
+      background-size: 480px 480px, 520px 520px, 260px 260px, 600px 600px;
+      box-shadow: inset 0 0 28px var(--paper-edge), inset 0 0 3px rgba(120, 90, 50, 0.25);
+    }
+
+    .chu-paper.paper-white { --paper: #f5f0e4; --paper-edge: rgba(150, 120, 70, 0.22); }
+    .chu-paper.paper-cream { --paper: #efe2c6; --paper-edge: rgba(150, 110, 55, 0.32); }
+    .chu-paper.paper-aged  { --paper: #e0c89c; --paper-edge: rgba(120, 78, 30, 0.45); }
+    .chu-paper.paper-ink   { --paper: #d9d2c3; --paper-edge: rgba(60, 55, 45, 0.35); }
+
+    .chu-viewport {
+      position: relative;
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+    }
+
+    /* 먹이 종이에 스며든 느낌: 먹 위에 종이결을 한 겹 더 */
+    .chu-viewport::after {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background-image: var(--fiber-v), var(--grain);
+      background-size: 480px 480px, 260px 260px;
+      opacity: 0.35;
+      pointer-events: none;
+      z-index: 2;
+    }
+
+    .ink-track {
+      position: absolute;
+      top: 0;
+      left: 0;
+      height: 100%;
+      display: flex;
+      align-items: center;
+      white-space: nowrap;
+      will-change: transform;
+      z-index: 1;
+      mix-blend-mode: multiply;
+    }
+
+    .ink-track.centered {
+      left: 50%;
+      transform: translateX(-50%);
+    }
+
+    .ink-seg { display: inline-block; }
+    .ink-seg.gap { padding-right: 3em; }
+
+    .ink-text-inner {
+      display: inline-block;
+      padding: 0 0.45em;
+      font-family: var(--font-family), 'Nanum Brush Script', "Gungsuh", "궁서", serif;
+      font-size: calc((var(--panel-h) - var(--pad-y) * 2) * 0.68);
+      font-weight: normal;
+      line-height: 1.1;
+      letter-spacing: 0.03em;
+      transform: translate(var(--ink-shift-x, 0px), var(--ink-shift, 0px));
+      transition: opacity 0.9s ease;
+    }
+
+    .tex-on .ink-text-inner { filter: url(#ink-brush); }
+
+    .ink-char {
+      display: inline-block;
+      color: var(--ink);
+      opacity: var(--tone, 1);
+      transform: translateY(var(--dy, 0)) rotate(var(--rot, 0deg));
+      text-shadow: 0 0 1px var(--ink-bleed), 0 0 0.12em var(--ink-bleed);
+    }
+
+    .ink-char.ink-space { min-width: 0.3em; }
+
+    /* 마지막 글자 뒤 자간이 남으면 글귀가 왼쪽으로 쏠려 보입니다 */
+    .ink-char:last-child { letter-spacing: 0; }
+
+    /* 붓으로 한 획씩 써 내려가는 효과 */
+    .is-writing .ink-char {
+      -webkit-mask-image: linear-gradient(115deg, #000 40%, transparent 60%);
+      mask-image: linear-gradient(115deg, #000 40%, transparent 60%);
+      -webkit-mask-size: 340% 100%;
+      mask-size: 340% 100%;
+      -webkit-mask-repeat: no-repeat;
+      mask-repeat: no-repeat;
+      -webkit-mask-position: 100% 0;
+      mask-position: 100% 0;
+      animation: ink-write var(--write-dur) cubic-bezier(0.5, 0.05, 0.3, 1) forwards;
+      animation-delay: var(--write-delay, 0s);
+    }
+
+    @keyframes ink-write {
+      0%   { -webkit-mask-position: 100% 0; mask-position: 100% 0; }
+      100% { -webkit-mask-position: 0 0; mask-position: 0 0; }
+    }
+
+    .is-fading .ink-text-inner,
+    .is-fading .seal { opacity: 0; transition: opacity 0.9s ease; }
+
+    /* ── 도장 ─────────────────────────── */
+    .seal {
+      position: absolute;
+      right: calc(var(--panel-h) * 0.08);
+      bottom: calc(var(--panel-h) * 0.08);
+      width: calc((var(--panel-h) - var(--pad-y) * 2) * 0.3);
+      height: calc((var(--panel-h) - var(--pad-y) * 2) * 0.3);
+      min-width: 20px;
+      min-height: 20px;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      writing-mode: vertical-rl;
+      font-family: 'Song Myung', serif;
+      font-size: calc((var(--panel-h) - var(--pad-y) * 2) * 0.1);
+      line-height: 1;
+      color: var(--paper);
+      background: #b3261e;
+      border-radius: 3px;
+      box-shadow: inset 0 0 0 2px #b3261e, inset 0 0 0 3px rgba(245, 240, 228, 0.7);
+      mix-blend-mode: multiply;
+      filter: url(#seal-rough);
+      opacity: 0.9;
+      transform: rotate(-3deg);
+      z-index: 3;
+      pointer-events: none;
+    }
+
+    .seal-on .seal { display: flex; }
+
+    .is-writing .seal { opacity: 0; transform: rotate(-3deg) scale(1.5); }
+
+    .is-writing.stamped .seal {
+      opacity: 0.9;
+      transform: rotate(-3deg) scale(1);
+      transition: opacity 0.18s ease-out, transform 0.22s cubic-bezier(0.3, 1.6, 0.5, 1);
+    }
+
+    @keyframes ink-marquee {
+      0%   { transform: translateX(0); }
+      100% { transform: translateX(-50%); }
+    }
+
+    /* ── 관리 패널 ───────────────────────── */
+    .hint {
+      font-size: 0.85rem;
+      color: var(--text-muted);
+      text-align: center;
+      line-height: 1.6;
+      max-width: 640px;
+    }
+
+    .toggle-field {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 0.75rem;
+      padding: 0.65rem 0.85rem;
+      background: var(--surface-2);
+      border: 1px solid var(--line);
+      border-radius: 8px;
+    }
+
+    .toggle-field label {
+      margin: 0;
+      font-size: 0.88rem;
+      color: var(--text);
+    }
+
+    .toggle-field small {
+      display: block;
+      font-size: 0.72rem;
+      color: var(--text-muted);
+      margin-top: 0.15rem;
+    }
+
+    .toggle-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+      gap: 0.6rem;
+    }
+
+    .btn-toggle {
+      min-width: 64px;
+      padding: 0.45rem 0.9rem;
+      font-size: 0.82rem;
+      font-weight: 700;
+      border-radius: 999px;
+      background: rgba(255, 255, 255, 0.06);
+      color: var(--text-muted);
+      border: 1px solid var(--line);
+    }
+
+    .btn-toggle.active {
+      background: var(--accent);
+      color: #fff5ea;
+      border-color: rgba(255, 200, 180, 0.35);
+    }
+
+    .stack-controls {
+      display: flex;
+      gap: 0.5rem;
+      width: var(--panel-w);
+      max-width: 100%;
+      justify-content: flex-end;
+    }
+
+    .btn-stack {
+      width: 40px;
+      height: 40px;
+      padding: 0;
+      font-size: 1.25rem;
+      line-height: 1;
+      font-weight: 700;
+      border-radius: 8px;
+    }
+
+    .btn-stack:disabled {
+      opacity: 0.35;
+      cursor: not-allowed;
+    }
+
+    .admin-panel {
+      width: min(640px, 100%);
+      background: var(--surface);
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      padding: 1.25rem 1.35rem;
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+    }
+
+    .section-label {
+      font-size: 0.8rem;
+      color: var(--text-muted);
+      margin-bottom: -0.4rem;
+    }
+
+    .boards-editor {
+      display: flex;
+      flex-direction: column;
+      gap: 0.75rem;
+    }
+
+    .board-editor-row {
+      display: flex;
+      flex-direction: column;
+      gap: 0.55rem;
+      padding: 0.75rem;
+      background: var(--surface-2);
+      border: 1px solid var(--line);
+      border-radius: 8px;
+    }
+
+    .board-editor-head {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .board-editor-num {
+      font-size: 0.75rem;
+      color: var(--text-muted);
+      flex-shrink: 0;
+      min-width: 1.5rem;
+    }
+
+    .board-editor-head input {
+      flex: 1;
+      min-width: 0;
+      padding: 0.55rem 0.75rem;
+      font-size: 0.95rem;
+      font-family: inherit;
+      color: var(--text);
+      background: var(--surface);
+      border: 1px solid var(--line);
+      border-radius: 6px;
+      outline: none;
+    }
+
+    .board-editor-head input:focus { border-color: rgba(192, 57, 43, 0.6); }
+
+    .ink-palette {
+      display: flex;
+      gap: 0.45rem;
+    }
+
+    .ink-swatch {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.35rem;
+      padding: 0.3rem 0.7rem 0.3rem 0.35rem;
+      font-size: 0.78rem;
+      font-family: inherit;
+      color: var(--text-muted);
+      background: rgba(255, 255, 255, 0.04);
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      cursor: pointer;
+    }
+
+    .ink-swatch i {
+      width: 16px;
+      height: 16px;
+      border-radius: 50%;
+      background: var(--sw);
+      box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.15);
+    }
+
+    .ink-swatch.active {
+      color: var(--text);
+      border-color: rgba(192, 57, 43, 0.7);
+      background: var(--accent-soft);
+    }
+
+    .field label {
+      display: block;
+      font-size: 0.8rem;
+      color: var(--text-muted);
+      margin-bottom: 0.4rem;
+    }
+
+    .field input[type="number"],
+    .field input[type="text"],
+    .field select {
+      width: 100%;
+      padding: 0.65rem 0.85rem;
+      font-size: 0.95rem;
+      font-family: inherit;
+      color: var(--text);
+      background-color: var(--surface-2);
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      outline: none;
+    }
+
+    .field select {
+      appearance: none;
+      -webkit-appearance: none;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6' viewBox='0 0 10 6'%3E%3Cpath d='M0 0L5 6L10 0Z' fill='%239a8f7c'/%3E%3C/svg%3E");
+      background-repeat: no-repeat;
+      background-position: right 0.85rem center;
+    }
+
+    .field select:focus,
+    .field input:focus { border-color: rgba(192, 57, 43, 0.6); }
+
+    .field select option {
+      background-color: var(--surface);
+      color: var(--text);
+    }
+
+    .field input[type="color"] {
+      width: 100%;
+      height: 42px;
+      padding: 2px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: var(--surface-2);
+      cursor: pointer;
+    }
+
+    .row {
+      display: flex;
+      gap: 0.75rem;
+      flex-wrap: wrap;
+      align-items: flex-end;
+    }
+
+    .row .field { flex: 1; min-width: 120px; }
+
+    input[type="range"] {
+      width: 100%;
+      accent-color: var(--accent);
+    }
+
+    .range-val {
+      font-size: 0.8rem;
+      color: var(--text-muted);
+      text-align: right;
+      margin-top: 0.25rem;
+    }
+
+    .btn {
+      padding: 0.6rem 1.1rem;
+      font-size: 0.9rem;
+      font-family: inherit;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: opacity 0.15s;
+    }
+
+    .btn:hover { opacity: 0.88; }
+
+    .btn-secondary {
+      background: rgba(255, 255, 255, 0.07);
+      color: var(--text);
+    }
+
+    .btn-obs-copy {
+      flex-shrink: 0;
+      padding: 0.5rem 0.75rem;
+      font-size: 0.78rem;
+      white-space: nowrap;
+      background: var(--accent-soft);
+      color: #f0a596;
+      border: 1px solid rgba(192, 57, 43, 0.4);
+    }
+
+    .btn-obs-copy:hover { background: rgba(192, 57, 43, 0.3); }
+
+    .btn-obs-copy.copied {
+      background: rgba(74, 222, 128, 0.18);
+      color: #4ade80;
+      border-color: rgba(74, 222, 128, 0.35);
+    }
+
+    .main {
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 2rem 1rem 3rem;
+      overflow: auto;
+    }
+    body.chroma-key .main { margin-left: 0; padding: 0; }
+    @media (max-width: 768px) {
+      .main { padding: 1.25rem 1rem 2rem; }
+    }
+    .layout { display: flex; min-height: 100vh; width: 100%; }
+    .main { flex: 1; margin-left: 0; min-width: 0; }
+  </style>
+</head>
+<body>
+  <!-- 붓 질감 필터: 획 가장자리 거칠게 + 갈필(마른 붓) 결 + 먹 번짐 -->
+  <svg width="0" height="0" style="position:absolute" aria-hidden="true">
+    <defs>
+      <filter id="ink-brush" x="-5%" y="-10%" width="110%" height="120%">
+        <feTurbulence type="fractalNoise" baseFrequency="0.04" numOctaves="3" seed="3" result="warp"/>
+        <feDisplacementMap in="SourceGraphic" in2="warp" scale="4" xChannelSelector="R" yChannelSelector="G" result="rough"/>
+        <feTurbulence type="fractalNoise" baseFrequency="0.02 0.7" numOctaves="2" seed="9" result="streak"/>
+        <feColorMatrix in="streak" type="matrix" values="0 0 0 0 0  0 0 0 0 0  0 0 0 0 0  0 0 0 -3.2 2.6" result="dryMask"/>
+        <feComposite in="rough" in2="dryMask" operator="in" result="dry"/>
+        <feGaussianBlur in="rough" stdDeviation="1.6" result="bleedBlur"/>
+        <feComponentTransfer in="bleedBlur" result="bleed">
+          <feFuncA type="linear" slope="0.28"/>
+        </feComponentTransfer>
+        <feGaussianBlur in="dry" stdDeviation="0.3" result="soft"/>
+        <feMerge>
+          <feMergeNode in="bleed"/>
+          <feMergeNode in="soft"/>
+        </feMerge>
+      </filter>
+      <filter id="seal-rough" x="-10%" y="-10%" width="120%" height="120%">
+        <feTurbulence type="fractalNoise" baseFrequency="0.9" numOctaves="2" seed="5" result="n"/>
+        <feColorMatrix in="n" type="matrix" values="0 0 0 0 0  0 0 0 0 0  0 0 0 0 0  0 0 0 -2.4 2.15" result="holes"/>
+        <feTurbulence type="fractalNoise" baseFrequency="0.08" numOctaves="2" seed="2" result="w"/>
+        <feDisplacementMap in="SourceGraphic" in2="w" scale="2.5" xChannelSelector="R" yChannelSelector="G" result="d"/>
+        <feComposite in="d" in2="holes" operator="in"/>
+      </filter>
+    </defs>
+  </svg>
+
+  <div class="layout">
+    <main class="main">
+      <div class="page-wrap">
+        <h1 class="page-title admin-only">한지 붓글씨판 <span class="stamp">추석</span></h1>
+
+        <div class="signboard-stack" id="signboard_stack"></div>
+
+        <div class="stack-controls admin-only">
+          <button type="button" class="btn btn-secondary btn-stack" id="remove_board_btn" title="판 제거" disabled>−</button>
+          <button type="button" class="btn btn-secondary btn-stack" id="add_board_btn" title="판 추가">+</button>
+        </div>
+
+        <div class="admin-panel admin-only">
+          <div class="section-label">글귀 목록</div>
+          <div class="boards-editor" id="boards_editor"></div>
+
+          <div class="toggle-grid">
+            <div class="toggle-field">
+              <label for="write_toggle">붓 쓰기 효과<small>한 글자씩 써 내려갑니다</small></label>
+              <button type="button" class="btn btn-toggle" id="write_toggle" aria-pressed="false">OFF</button>
+            </div>
+            <div class="toggle-field">
+              <label for="loop_toggle">반복 쓰기<small>다 쓰면 지우고 다시 씁니다</small></label>
+              <button type="button" class="btn btn-toggle" id="loop_toggle" aria-pressed="false">OFF</button>
+            </div>
+            <div class="toggle-field">
+              <label for="texture_toggle">먹 번짐 · 갈필<small>획 가장자리 번짐과 마른 붓결</small></label>
+              <button type="button" class="btn btn-toggle" id="texture_toggle" aria-pressed="false">OFF</button>
+            </div>
+            <div class="toggle-field">
+              <label for="tone_toggle">농담 · 손맛<small>글자마다 먹 농도와 기울기가 조금씩</small></label>
+              <button type="button" class="btn btn-toggle" id="tone_toggle" aria-pressed="false">OFF</button>
+            </div>
+          </div>
+
+          <div class="row">
+            <div class="field">
+              <label for="write_range">붓 속도 (글자당)</label>
+              <input type="range" id="write_range" min="0.15" max="1.5" value="0.6" step="0.05">
+              <div class="range-val" id="write_label">0.6초</div>
+            </div>
+            <div class="field">
+              <label for="speed_range">흐름 속도 (글이 길 때)</label>
+              <input type="range" id="speed_range" min="4" max="60" value="14" step="1">
+              <div class="range-val" id="speed_label">보통 · 가로 900px 기준 14초</div>
+            </div>
+          </div>
+
+          <div class="row">
+            <div class="field">
+              <label for="width_input">가로 (px)</label>
+              <input type="number" id="width_input" min="200" max="1920" value="900" step="10">
+            </div>
+            <div class="field">
+              <label for="height_input">세로 (px)</label>
+              <input type="number" id="height_input" min="60" max="400" value="160" step="5">
+            </div>
+          </div>
+
+          <div class="row">
+            <div class="field">
+              <label for="font_select">서체</label>
+              <select id="font_select">
+                <option value="brush" style="font-family: 'Nanum Brush Script';">나눔 붓글씨</option>
+                <option value="dokdo" style="font-family: 'East Sea Dokdo';">동해 독도 (거친 붓)</option>
+                <option value="songmyung" style="font-family: 'Song Myung';">송명 (명조)</option>
+                <option value="yeonsung" style="font-family: 'Yeon Sung';">연성</option>
+                <option value="jeonju" style="font-family: 'JeonjuWanpanbonGak';">전주완판본</option>
+              </select>
+            </div>
+            <div class="field">
+              <label for="paper_select">한지</label>
+              <select id="paper_select">
+                <option value="white">백지 (흰 한지)</option>
+                <option value="cream">미색 한지</option>
+                <option value="aged">고지 (누런 옛 종이)</option>
+                <option value="ink">담묵지 (회색빛)</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="row">
+            <div class="field">
+              <label for="frame_select">표구</label>
+              <select id="frame_select">
+                <option value="none">없음 (한지만)</option>
+                <option value="scroll">두루마리 (비단 + 나무 축)</option>
+                <option value="wood">나무 액자</option>
+              </select>
+            </div>
+            <div class="field">
+              <label for="mount_color_input">비단 색상</label>
+              <input type="color" id="mount_color_input" value="#34503f">
+            </div>
+          </div>
+
+          <div class="row">
+            <div class="field" style="flex:0 0 auto;min-width:0;">
+              <label>&nbsp;</label>
+              <div class="toggle-field" style="padding:0.45rem 0.7rem;">
+                <label for="seal_toggle" style="margin-right:0.6rem;">도장</label>
+                <button type="button" class="btn btn-toggle" id="seal_toggle" aria-pressed="false">OFF</button>
+              </div>
+            </div>
+            <div class="field">
+              <label for="seal_text_input">도장 글자 (1~4자)</label>
+              <input type="text" id="seal_text_input" maxlength="4" value="秋" autocomplete="off">
+            </div>
+          </div>
+        </div>
+      </div>
+    </main>
+  </div>
+  <script>
+    (function () {
+      var STORAGE_KEY = "bangsong_chu_v1";
+      var CHROMA_STORAGE_KEY = "bangsong_roulette_chroma_v1";
+      var WRITE_HOLD_MS = 3200;
+      var FADE_MS = 950;
+
+      // 먹 색: 먹 / 금니 두 가지만 씁니다.
+      var INKS = {
+        meok: { label: "먹", color: "#1a1714", bleed: "rgba(26, 23, 20, 0.22)" },
+        gold: { label: "금니", color: "#a8832c", bleed: "rgba(168, 131, 44, 0.25)" }
+      };
+
+      var FONT_FAMILIES = {
+        brush: "'Nanum Brush Script'",
+        dokdo: "'East Sea Dokdo'",
+        songmyung: "'Song Myung'",
+        yeonsung: "'Yeon Sung'",
+        jeonju: "'JeonjuWanpanbonGak'"
+      };
+
+      // GitHub의 fonts 폴더를 자동으로 읽어 새 폰트를 추가합니다. (index.html과 동일)
+      var GITHUB_FONT_REPO = "rabbbibot/neon";
+      var GITHUB_FONT_BRANCH = "main";
+      var FONT_FOLDER_ALIASES = {
+        jeonju: ["jeonju"]
+      };
+
+      var PAPERS = ["white", "cream", "aged", "ink"];
+      var FRAMES = ["none", "scroll", "wood"];
+
+      var isObs = /(?:^|[?&])obs=1(?:&|$)/.test(location.search);
+      var params = new URLSearchParams(location.search);
+      var chromaState = { enabled: false, color: "#00b140" };
+      var writeTimers = [];
+
+      var defaultBoard = function () {
+        return { text: "", ink: "meok" };
+      };
+
+      var defaults = {
+        speed: 14,
+        width: 900,
+        height: 160,
+        font: "brush",
+        paper: "white",
+        frame: "none",
+        mountColor: "#34503f",
+        write: true,
+        loop: true,
+        writeDur: 0.6,
+        texture: true,
+        tone: true,
+        seal: true,
+        sealText: "秋",
+        boards: [{ text: "붓 가는 대로 마음 가는 대로", ink: "meok" }]
+      };
+
+      var state = loadState();
+      applyUrlParams();
+
+      var els = {
+        body: document.body,
+        stack: document.getElementById("signboard_stack"),
+        editor: document.getElementById("boards_editor"),
+        addBtn: document.getElementById("add_board_btn"),
+        removeBtn: document.getElementById("remove_board_btn"),
+        speedRange: document.getElementById("speed_range"),
+        speedLabel: document.getElementById("speed_label"),
+        writeRange: document.getElementById("write_range"),
+        writeLabel: document.getElementById("write_label"),
+        widthInput: document.getElementById("width_input"),
+        heightInput: document.getElementById("height_input"),
+        writeToggle: document.getElementById("write_toggle"),
+        loopToggle: document.getElementById("loop_toggle"),
+        textureToggle: document.getElementById("texture_toggle"),
+        toneToggle: document.getElementById("tone_toggle"),
+        sealToggle: document.getElementById("seal_toggle"),
+        sealTextInput: document.getElementById("seal_text_input"),
+        fontSelect: document.getElementById("font_select"),
+        paperSelect: document.getElementById("paper_select"),
+        frameSelect: document.getElementById("frame_select"),
+        mountColorInput: document.getElementById("mount_color_input")
+      };
+
+      if (isObs) {
+        els.body.classList.add("obs");
+        document.documentElement.classList.add("obs");
+      }
+
+      if (!params.has("chroma") && !params.get("chromaColor")) {
+        loadChromaState();
+      } else {
+        saveChromaState();
+      }
+      applyChromaState();
+
+      bindUI();
+      renderAll();
+      loadFontsFromGithub();
+
+      // 웹폰트가 늦게 도착하면 글자 폭이 바뀌므로 흐름 계산을 다시 합니다.
+      if (document.fonts && document.fonts.ready) {
+        document.fonts.ready.then(function () { restartAll(); });
+      }
+
+      function loadFontsFromGithub() {
+        var apiUrl = "https://api.github.com/repos/" + GITHUB_FONT_REPO + "/git/trees/" + GITHUB_FONT_BRANCH + "?recursive=1";
+        fetch(apiUrl, { headers: { Accept: "application/vnd.github+json" } })
+          .then(function (response) {
+            if (!response.ok) throw new Error("GitHub 폰트 목록을 불러오지 못했습니다.");
+            return response.json();
+          })
+          .then(function (data) {
+            var files = (data.tree || []).filter(function (item) {
+              return item.type === "blob" && /^fonts\/.+\.(woff2?|ttf|otf)$/i.test(item.path);
+            });
+
+            var groups = {};
+            files.forEach(function (file) {
+              var parts = file.path.split("/");
+              var folder = parts.length > 2 ? parts[1] : parts[parts.length - 1].replace(/\.[^.]+$/, "");
+              var folderKey = folder.toLowerCase().replace(/[^a-z0-9가-힣]+/g, "");
+              var builtInKey = getBuiltInFontKey(folderKey);
+              var groupKey = builtInKey || folderKey;
+              if (!groupKey) return;
+              if (!groups[groupKey]) groups[groupKey] = { name: folder, files: [], builtInKey: builtInKey };
+              groups[groupKey].files.push(file);
+            });
+
+            return Promise.all(Object.keys(groups).map(function (groupKey) {
+              var group = groups[groupKey];
+              var key = group.builtInKey || ("custom_" + groupKey);
+              var family = group.builtInKey ? FONT_FAMILIES[group.builtInKey].replace(/'/g, "") : "CustomFont_" + groupKey;
+              var loads = group.files.map(function (file) {
+                var rawUrl = "https://raw.githubusercontent.com/" + GITHUB_FONT_REPO + "/" + GITHUB_FONT_BRANCH + "/" + file.path.split("/").map(encodeURIComponent).join("/");
+                var weight = getFontWeight(file.path);
+                var style = /italic|oblique/i.test(file.path) ? "italic" : "normal";
+                var font = new FontFace(family, "url(\"" + rawUrl + "\")", { weight: String(weight), style: style });
+                return font.load().then(function (loaded) {
+                  document.fonts.add(loaded);
+                  return loaded;
+                }).catch(function () { return null; });
+              });
+              return Promise.all(loads).then(function () {
+                if (!document.fonts.check("16px '" + family + "'")) return;
+                if (group.builtInKey) {
+                  applyFont();
+                } else {
+                  addFontOption(key, family, group.name);
+                }
+              });
+            }));
+          })
+          .catch(function () {
+            // GitHub API가 잠시 제한되거나 오프라인이어도 기본 서체는 그대로 작동합니다.
+          });
+      }
+
+      function getBuiltInFontKey(folderKey) {
+        var keys = Object.keys(FONT_FOLDER_ALIASES);
+        for (var i = 0; i < keys.length; i++) {
+          var aliases = FONT_FOLDER_ALIASES[keys[i]];
+          if (aliases.indexOf(folderKey) > -1) return keys[i];
+        }
+        return null;
+      }
+
+      function getFontWeight(path) {
+        var name = path.toLowerCase();
+        if (/thin|hairline/.test(name)) return 100;
+        if (/extra.?light|ultra.?light/.test(name)) return 200;
+        if (/light/.test(name)) return 300;
+        if (/medium/.test(name)) return 500;
+        if (/semi.?bold|demi.?bold/.test(name)) return 600;
+        if (/extra.?bold|ultra.?bold/.test(name)) return 800;
+        if (/bold|black|heavy/.test(name)) return 700;
+        return 400;
+      }
+
+      function addFontOption(key, family, label) {
+        if (FONT_FAMILIES[key]) return;
+        FONT_FAMILIES[key] = "'" + family.replace(/'/g, "") + "'";
+        var option = document.createElement("option");
+        option.value = key;
+        option.textContent = label;
+        option.style.fontFamily = FONT_FAMILIES[key];
+        option.dataset.autoFont = "true";
+        els.fontSelect.appendChild(option);
+        if (state.font === key) {
+          els.fontSelect.value = key;
+          applyFont();
+          restartAll();
+        }
+      }
+
+      function loadState() {
+        try {
+          var raw = localStorage.getItem(STORAGE_KEY);
+          if (raw) {
+            var parsed = JSON.parse(raw);
+            if (parsed && parsed.boards && parsed.boards.length) {
+              return normalizeState(parsed);
+            }
+          }
+        } catch (e) { /* ignore */ }
+        return normalizeState(defaults);
+      }
+
+      function pickBool(v, fallback) {
+        return typeof v === "boolean" ? v : fallback;
+      }
+
+      function normalizeState(s) {
+        var boards = (s.boards || [defaultBoard()]).map(function (b) {
+          return {
+            text: b.text != null ? String(b.text) : "",
+            ink: INKS[b.ink] ? b.ink : "meok"
+          };
+        });
+        if (!boards.length) boards = [defaultBoard()];
+        return {
+          speed: clampNum(+s.speed, 4, 60) || defaults.speed,
+          width: clampNum(+s.width, 200, 1920) || defaults.width,
+          height: clampNum(+s.height, 60, 400) || defaults.height,
+          font: FONT_FAMILIES[s.font] || /^custom_/.test(String(s.font)) ? String(s.font) : defaults.font,
+          paper: PAPERS.indexOf(s.paper) > -1 ? s.paper : defaults.paper,
+          frame: FRAMES.indexOf(s.frame) > -1 ? s.frame : defaults.frame,
+          mountColor: isHex(s.mountColor) ? s.mountColor : defaults.mountColor,
+          write: pickBool(s.write, defaults.write),
+          loop: pickBool(s.loop, defaults.loop),
+          writeDur: clampNum(+s.writeDur, 0.15, 1.5) || defaults.writeDur,
+          texture: pickBool(s.texture, defaults.texture),
+          tone: pickBool(s.tone, defaults.tone),
+          seal: pickBool(s.seal, defaults.seal),
+          sealText: s.sealText != null ? String(s.sealText).slice(0, 4) : defaults.sealText,
+          boards: boards
+        };
+      }
+
+      function isHex(v) {
+        return /^#[0-9a-f]{6}$/i.test(String(v || ""));
+      }
+
+      function decodeColorParam(v, fallback) {
+        if (!v) return fallback;
+        var c = v;
+        try { c = decodeURIComponent(v); } catch (e) { /* ignore */ }
+        if (c.charAt(0) !== "#") c = "#" + c;
+        return isHex(c) ? c : fallback;
+      }
+
+      function applyUrlParams() {
+        if (params.has("lines")) {
+          var texts = params.get("lines").split("|");
+          var inks = (params.get("inks") || "").split("|");
+          state.boards = texts.map(function (t, i) {
+            var ink = inks[i] || inks[0];
+            return { text: t, ink: INKS[ink] ? ink : "meok" };
+          });
+        } else if (params.has("text")) {
+          state.boards[0].text = params.get("text");
+        }
+        if (params.get("speed")) state.speed = clampNum(+params.get("speed"), 4, 60) || state.speed;
+        if (params.get("w")) state.width = clampNum(+params.get("w"), 200, 1920) || state.width;
+        if (params.get("h")) state.height = clampNum(+params.get("h"), 60, 400) || state.height;
+        if (params.get("font") && FONT_FAMILIES[params.get("font")]) state.font = params.get("font");
+        if (PAPERS.indexOf(params.get("paper")) > -1) state.paper = params.get("paper");
+        if (FRAMES.indexOf(params.get("frame")) > -1) state.frame = params.get("frame");
+        if (params.get("mount")) state.mountColor = decodeColorParam(params.get("mount"), state.mountColor);
+        if (params.has("write")) state.write = params.get("write") !== "0";
+        if (params.has("loop")) state.loop = params.get("loop") !== "0";
+        if (params.get("wdur")) state.writeDur = clampNum(+params.get("wdur"), 0.15, 1.5) || state.writeDur;
+        if (params.has("tex")) state.texture = params.get("tex") !== "0";
+        if (params.has("tone")) state.tone = params.get("tone") !== "0";
+        if (params.has("seal")) state.seal = params.get("seal") !== "0";
+        if (params.has("sealText")) state.sealText = params.get("sealText").slice(0, 4);
+        if (params.has("chroma")) chromaState.enabled = params.get("chroma") !== "0";
+        if (params.get("chromaColor")) chromaState.color = decodeColorParam(params.get("chromaColor"), chromaState.color);
+      }
+
+      function saveState() {
+        if (isObs) return;
+        try {
+          localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+        } catch (e) { /* ignore */ }
+      }
+
+      function clampNum(n, min, max) {
+        if (!isFinite(n)) return null;
+        return Math.min(max, Math.max(min, n));
+      }
+
+      // 같은 글자는 항상 같은 손맛이 나도록 위치+글자로 만든 고정 난수
+      function seeded(i, ch, salt) {
+        var x = Math.sin((i + 1) * 12.9898 + ch.charCodeAt(0) * 78.233 + salt * 37.719) * 43758.5453;
+        return x - Math.floor(x);
+      }
+
+      function buildObsUrl(index) {
+        var board = state.boards[index];
+        if (!board) return location.href;
+        var q = new URLSearchParams();
+        q.set("obs", "1");
+        q.set("lines", board.text || "");
+        q.set("inks", board.ink);
+        q.set("speed", String(state.speed));
+        q.set("w", String(state.width));
+        q.set("h", String(state.height));
+        q.set("font", state.font);
+        q.set("paper", state.paper);
+        q.set("frame", state.frame);
+        q.set("mount", state.mountColor);
+        q.set("write", state.write ? "1" : "0");
+        q.set("loop", state.loop ? "1" : "0");
+        q.set("wdur", String(state.writeDur));
+        q.set("tex", state.texture ? "1" : "0");
+        q.set("tone", state.tone ? "1" : "0");
+        q.set("seal", state.seal ? "1" : "0");
+        q.set("sealText", state.sealText);
+        if (chromaState.enabled) {
+          q.set("chroma", "1");
+          q.set("chromaColor", chromaState.color);
+        }
+        return location.href.split(/[?#]/)[0] + "?" + q.toString();
+      }
+
+      function copyText(text) {
+        if (navigator.clipboard && navigator.clipboard.writeText) {
+          return navigator.clipboard.writeText(text);
+        }
+        return new Promise(function (resolve, reject) {
+          try {
+            var ta = document.createElement("textarea");
+            ta.value = text;
+            ta.setAttribute("readonly", "");
+            ta.style.position = "fixed";
+            ta.style.left = "-9999px";
+            document.body.appendChild(ta);
+            ta.select();
+            document.execCommand("copy");
+            document.body.removeChild(ta);
+            resolve();
+          } catch (e) {
+            reject(e);
+          }
+        });
+      }
+
+      function copyObsLink(index, btn) {
+        var url = buildObsUrl(index);
+        var label = "OBS 링크";
+        copyText(url).then(function () {
+          btn.textContent = "복사됨!";
+          btn.classList.add("copied");
+          setTimeout(function () {
+            btn.textContent = label;
+            btn.classList.remove("copied");
+          }, 1600);
+        }).catch(function () {
+          btn.textContent = "복사 실패";
+          setTimeout(function () {
+            btn.textContent = label;
+          }, 1600);
+        });
+      }
+
+      function bindToggle(btn, key, after) {
+        btn.addEventListener("click", function () {
+          state[key] = !state[key];
+          syncToggles();
+          if (after) after();
+          saveState();
+        });
+      }
+
+      function bindUI() {
+        els.speedRange.value = state.speed;
+        els.writeRange.value = state.writeDur;
+        els.widthInput.value = state.width;
+        els.heightInput.value = state.height;
+        els.fontSelect.value = state.font;
+        els.paperSelect.value = state.paper;
+        els.frameSelect.value = state.frame;
+        els.mountColorInput.value = state.mountColor;
+        els.sealTextInput.value = state.sealText;
+        syncToggles();
+        updateSpeedLabel(state.speed);
+        updateWriteLabel(state.writeDur);
+
+        bindToggle(els.writeToggle, "write", restartAll);
+        bindToggle(els.loopToggle, "loop", restartAll);
+        bindToggle(els.textureToggle, "texture", applyLook);
+        bindToggle(els.toneToggle, "tone", function () { renderDisplay(); applyLook(); restartAll(); });
+        bindToggle(els.sealToggle, "seal", applyLook);
+
+        els.sealTextInput.addEventListener("input", function () {
+          state.sealText = els.sealTextInput.value.slice(0, 4);
+          applyLook();
+          saveState();
+        });
+
+        els.fontSelect.addEventListener("change", function () {
+          state.font = els.fontSelect.value;
+          applyFont();
+          restartAll();
+          saveState();
+        });
+
+        els.paperSelect.addEventListener("change", function () {
+          state.paper = els.paperSelect.value;
+          applyLook();
+          saveState();
+        });
+
+        els.frameSelect.addEventListener("change", function () {
+          state.frame = els.frameSelect.value;
+          applyLook();
+          restartAll();
+          saveState();
+        });
+
+        els.mountColorInput.addEventListener("input", function () {
+          state.mountColor = els.mountColorInput.value;
+          applyLook();
+          saveState();
+        });
+
+        els.addBtn.addEventListener("click", function () {
+          state.boards.push(defaultBoard());
+          renderAll();
+          saveState();
+        });
+
+        els.removeBtn.addEventListener("click", function () {
+          if (state.boards.length <= 1) return;
+          state.boards.pop();
+          renderAll();
+          saveState();
+        });
+
+        els.speedRange.addEventListener("input", function () {
+          state.speed = +els.speedRange.value;
+          updateSpeedLabel(state.speed);
+          applyAllScroll();
+          saveState();
+        });
+
+        els.writeRange.addEventListener("change", function () {
+          state.writeDur = +els.writeRange.value;
+          updateWriteLabel(state.writeDur);
+          applyLook();
+          restartAll();
+          saveState();
+        });
+
+        els.writeRange.addEventListener("input", function () {
+          updateWriteLabel(+els.writeRange.value);
+        });
+
+        els.widthInput.addEventListener("change", function () {
+          state.width = clampNum(+els.widthInput.value, 200, 1920) || defaults.width;
+          els.widthInput.value = state.width;
+          updateSpeedLabel(state.speed);
+          applySize();
+          applyAllScroll();
+          saveState();
+        });
+
+        els.heightInput.addEventListener("change", function () {
+          state.height = clampNum(+els.heightInput.value, 60, 400) || defaults.height;
+          els.heightInput.value = state.height;
+          applySize();
+          applyAllScroll();
+          saveState();
+        });
+
+        window.addEventListener("resize", applyAllScroll);
+      }
+
+      function syncToggle(btn, on) {
+        btn.classList.toggle("active", on);
+        btn.setAttribute("aria-pressed", on ? "true" : "false");
+        btn.textContent = on ? "ON" : "OFF";
+      }
+
+      function syncToggles() {
+        syncToggle(els.writeToggle, state.write);
+        syncToggle(els.loopToggle, state.loop);
+        syncToggle(els.textureToggle, state.texture);
+        syncToggle(els.toneToggle, state.tone);
+        syncToggle(els.sealToggle, state.seal);
+        els.loopToggle.disabled = !state.write;
+        els.loopToggle.style.opacity = state.write ? "" : "0.4";
+      }
+
+      function renderAll() {
+        renderDisplay();
+        renderEditor();
+        applySize();
+        applyFont();
+        applyLook();
+        applyAllScroll();
+        restartAll();
+        els.removeBtn.disabled = state.boards.length <= 1;
+      }
+
+      function applyFont() {
+        var fam = FONT_FAMILIES[state.font] || FONT_FAMILIES.brush;
+        document.documentElement.style.setProperty("--font-family", fam);
+        els.fontSelect.style.fontFamily = fam;
+      }
+
+      function applyLook() {
+        var root = document.documentElement.style;
+        root.setProperty("--mount-color", state.mountColor);
+        root.setProperty("--write-dur", state.writeDur + "s");
+        var frames = els.stack.querySelectorAll(".chu-frame");
+        frames.forEach(function (frame) {
+          FRAMES.forEach(function (f) { frame.classList.toggle("frame-" + f, state.frame === f); });
+          var paper = frame.querySelector(".chu-paper");
+          PAPERS.forEach(function (p) { paper.classList.toggle("paper-" + p, state.paper === p); });
+          paper.classList.toggle("tex-on", state.texture);
+          paper.classList.toggle("seal-on", state.seal && state.sealText.trim() !== "");
+          frame.querySelector(".seal").textContent = state.sealText.trim();
+        });
+      }
+
+      function renderDisplay() {
+        els.stack.innerHTML = "";
+        state.boards.forEach(function (board, i) {
+          var frame = document.createElement("div");
+          frame.className = "chu-frame";
+          frame.dataset.index = String(i);
+          frame.innerHTML =
+            '<div class="chu-paper">' +
+              '<div class="chu-viewport">' +
+                '<div class="ink-track centered">' +
+                  '<span class="ink-seg seg-a"></span>' +
+                  '<span class="ink-seg seg-b gap" aria-hidden="true"></span>' +
+                '</div>' +
+              '</div>' +
+              '<div class="seal" aria-hidden="true"></div>' +
+            '</div>';
+          els.stack.appendChild(frame);
+          fillInkSegment(frame.querySelector(".seg-a"), board);
+          fillInkSegment(frame.querySelector(".seg-b"), board);
+        });
+      }
+
+      function renderEditor() {
+        els.editor.innerHTML = "";
+        state.boards.forEach(function (board, i) {
+          var row = document.createElement("div");
+          row.className = "board-editor-row";
+          row.dataset.index = String(i);
+
+          var head = document.createElement("div");
+          head.className = "board-editor-head";
+
+          var num = document.createElement("span");
+          num.className = "board-editor-num";
+          num.textContent = (i + 1) + ".";
+
+          var input = document.createElement("input");
+          input.type = "text";
+          input.placeholder = "쓸 글귀";
+          input.maxLength = 200;
+          input.value = board.text;
+          input.autocomplete = "off";
+          input.addEventListener("input", function () {
+            state.boards[i].text = input.value;
+            updateBoardDisplay(i);
+            saveState();
+          });
+
+          var obsBtn = document.createElement("button");
+          obsBtn.type = "button";
+          obsBtn.className = "btn btn-obs-copy";
+          obsBtn.textContent = "OBS 링크";
+          obsBtn.title = "이 판만 보이는 OBS 브라우저 소스 URL 복사";
+          obsBtn.addEventListener("click", function () {
+            copyObsLink(i, obsBtn);
+          });
+
+          head.appendChild(num);
+          head.appendChild(input);
+          head.appendChild(obsBtn);
+
+          var palette = document.createElement("div");
+          palette.className = "ink-palette";
+          Object.keys(INKS).forEach(function (key) {
+            var sw = document.createElement("button");
+            sw.type = "button";
+            sw.className = "ink-swatch";
+            sw.dataset.ink = key;
+            sw.style.setProperty("--sw", INKS[key].color);
+            sw.innerHTML = "<i></i>";
+            sw.appendChild(document.createTextNode(INKS[key].label));
+            sw.addEventListener("click", function () {
+              state.boards[i].ink = key;
+              syncInkSwatches(row, key);
+              var frame = els.stack.querySelector('[data-index="' + i + '"]');
+              if (frame) applyInk(frame, key);
+              saveState();
+            });
+            palette.appendChild(sw);
+          });
+
+          row.appendChild(head);
+          row.appendChild(palette);
+          syncInkSwatches(row, board.ink);
+          els.editor.appendChild(row);
+        });
+      }
+
+      function syncInkSwatches(row, key) {
+        var sws = row.querySelectorAll(".ink-swatch");
+        for (var s = 0; s < sws.length; s++) {
+          sws[s].classList.toggle("active", sws[s].dataset.ink === key);
+        }
+      }
+
+      function applyInk(frame, key) {
+        var ink = INKS[key] || INKS.meok;
+        frame.style.setProperty("--ink", ink.color);
+        frame.style.setProperty("--ink-bleed", ink.bleed);
+      }
+
+      function fillInkSegment(segment, board) {
+        segment.innerHTML = "";
+        var inner = document.createElement("span");
+        inner.className = "ink-text-inner";
+        var chars = Array.from(board.text || "");
+        var writeIdx = 0;
+        chars.forEach(function (ch, charIdx) {
+          var isSpace = ch === " " || ch === " " || ch === "\t";
+          var span = document.createElement("span");
+          span.className = isSpace ? "ink-char ink-space" : "ink-char";
+          span.textContent = isSpace ? " " : ch;
+          if (!isSpace) {
+            span.dataset.w = String(writeIdx);
+            writeIdx += 1;
+            if (state.tone) {
+              span.style.setProperty("--tone", (0.8 + seeded(charIdx, ch, 1) * 0.2).toFixed(3));
+              span.style.setProperty("--rot", ((seeded(charIdx, ch, 2) - 0.5) * 5).toFixed(2) + "deg");
+              span.style.setProperty("--dy", ((seeded(charIdx, ch, 3) - 0.5) * 0.08).toFixed(3) + "em");
+            }
+          }
+          inner.appendChild(span);
+        });
+        segment.appendChild(inner);
+        var frame = segment.closest(".chu-frame");
+        if (frame) applyInk(frame, board.ink);
+      }
+
+      function updateBoardDisplay(index) {
+        var frame = els.stack.querySelector('[data-index="' + index + '"]');
+        if (!frame) return;
+        var board = state.boards[index];
+        fillInkSegment(frame.querySelector(".seg-a"), board);
+        fillInkSegment(frame.querySelector(".seg-b"), board);
+        requestAnimationFrame(function () {
+          applyScrollForFrame(frame);
+          startWriting(frame);
+        });
+      }
+
+      /* ── 붓 쓰기 연출 ───────────────────── */
+      function clearWriting(frame) {
+        var idx = +frame.dataset.index;
+        if (writeTimers[idx]) {
+          writeTimers[idx].forEach(clearTimeout);
+        }
+        writeTimers[idx] = [];
+        var paper = frame.querySelector(".chu-paper");
+        paper.classList.remove("is-writing", "stamped", "is-fading");
+      }
+
+      function startWriting(frame) {
+        clearWriting(frame);
+        if (!state.write) return;
+        var idx = +frame.dataset.index;
+        var paper = frame.querySelector(".chu-paper");
+        var step = state.writeDur * 0.72;
+        var count = 0;
+        var chars = frame.querySelectorAll(".ink-char[data-w]");
+        for (var c = 0; c < chars.length; c++) {
+          var w = +chars[c].dataset.w;
+          chars[c].style.setProperty("--write-delay", (w * step).toFixed(3) + "s");
+          if (w + 1 > count) count = w + 1;
+        }
+        if (!count) return;
+
+        void paper.offsetWidth;
+        paper.classList.add("is-writing");
+
+        var totalMs = ((count - 1) * step + state.writeDur) * 1000;
+        var timers = writeTimers[idx];
+        timers.push(setTimeout(function () {
+          paper.classList.add("stamped");
+        }, totalMs + 150));
+
+        if (state.loop) {
+          timers.push(setTimeout(function () {
+            paper.classList.add("is-fading");
+          }, totalMs + WRITE_HOLD_MS));
+          timers.push(setTimeout(function () {
+            startWriting(frame);
+          }, totalMs + WRITE_HOLD_MS + FADE_MS));
+        }
+      }
+
+      function restartAll() {
+        applyAllScroll();
+        var frames = els.stack.querySelectorAll(".chu-frame");
+        frames.forEach(startWriting);
+      }
+
+      /* ── 크기 · 흐름 ──────────────────────── */
+      function fitObsDocumentSize(w, h) {
+        var pxW = Math.ceil(w) + "px";
+        var pxH = Math.ceil(h) + "px";
+        document.documentElement.style.width = pxW;
+        document.documentElement.style.height = pxH;
+        document.body.style.width = pxW;
+        document.body.style.height = pxH;
+        var layout = document.querySelector(".layout");
+        if (layout) {
+          layout.style.width = pxW;
+          layout.style.height = pxH;
+        }
+      }
+
+      function applySize() {
+        document.documentElement.style.setProperty("--panel-w", state.width + "px");
+        document.documentElement.style.setProperty("--panel-h", state.height + "px");
+        if (isObs) {
+          var count = Math.max(1, state.boards.length);
+          var gap = count > 1 ? (count - 1) * 20 : 0;
+          fitObsDocumentSize(state.width, state.height * count + gap);
+        }
+      }
+
+      function computeScrollDuration(textW) {
+        var ref = state.width || 900;
+        var duration = (textW / ref) * state.speed;
+        return Math.max(2, Math.min(120, duration));
+      }
+
+      function applyAllScroll() {
+        var frames = els.stack.querySelectorAll(".chu-frame");
+        frames.forEach(function (frame) {
+          applyScrollForFrame(frame);
+        });
+      }
+
+      function applyScrollForFrame(frame) {
+        var viewport = frame.querySelector(".chu-viewport");
+        var track = frame.querySelector(".ink-track");
+        var segA = frame.querySelector(".seg-a");
+        var segB = frame.querySelector(".seg-b");
+        if (!viewport || !track || !segA) return;
+
+        track.classList.remove("centered");
+        track.style.animation = "none";
+        void track.offsetWidth;
+
+        var inner = segA.querySelector(".ink-text-inner");
+        centerInk(frame, inner);
+        var textW = inner ? inner.offsetWidth : segA.offsetWidth;
+        var vpW = viewport.clientWidth;
+
+        if (textW > vpW - 8) {
+          segB.style.display = "";
+          var duration = computeScrollDuration(textW);
+          track.style.animation = "ink-marquee " + duration + "s linear infinite";
+        } else {
+          segB.style.display = "none";
+          track.classList.add("centered");
+          track.style.animation = "";
+        }
+      }
+
+      // 서체마다 글자가 글자칸 안에서 위아래·좌우로 치우쳐 있으므로
+      // 실제 먹이 묻는 영역(글리프 경계)을 재서 한지 정중앙에 맞춥니다.
+      var measureCtx = null;
+
+      function centerInk(frame, inner) {
+        frame.style.setProperty("--ink-shift", "0px");
+        frame.style.setProperty("--ink-shift-x", "0px");
+        if (!inner || !inner.textContent.trim()) return;
+        var cs = getComputedStyle(inner);
+        if (!measureCtx) measureCtx = document.createElement("canvas").getContext("2d");
+        measureCtx.font = cs.fontSize + " " + cs.fontFamily;
+        measureCtx.textAlign = "left";
+        var m = measureCtx.measureText(inner.textContent);
+        if (m.fontBoundingBoxAscent == null || m.actualBoundingBoxAscent == null) return;
+
+        var lineH = parseFloat(cs.lineHeight) || parseFloat(cs.fontSize);
+        var fontH = m.fontBoundingBoxAscent + m.fontBoundingBoxDescent;
+        var baseline = (lineH - fontH) / 2 + m.fontBoundingBoxAscent;
+        var inkCenterY = baseline + (m.actualBoundingBoxDescent - m.actualBoundingBoxAscent) / 2;
+        var shiftY = lineH / 2 - inkCenterY;
+
+        // 왼쪽 여백(첫 글자)과 오른쪽 여백(끝 글자)의 차이만큼 옮깁니다.
+        var leftBearing = -m.actualBoundingBoxLeft;
+        var rightBearing = m.width - m.actualBoundingBoxRight;
+        var shiftX = (rightBearing - leftBearing) / 2;
+
+        if (isFinite(shiftY)) frame.style.setProperty("--ink-shift", shiftY.toFixed(1) + "px");
+        if (isFinite(shiftX)) frame.style.setProperty("--ink-shift-x", shiftX.toFixed(1) + "px");
+      }
+
+      function updateSpeedLabel(s) {
+        var label = s <= 8 ? "빠름" : s <= 20 ? "보통" : "느림";
+        els.speedLabel.textContent = label + " · 가로 " + state.width + "px 기준 " + s + "초";
+      }
+
+      function updateWriteLabel(d) {
+        var label = d <= 0.35 ? "휘갈겨 쓰기" : d <= 0.8 ? "또박또박" : "천천히 정성껏";
+        els.writeLabel.textContent = label + " · " + d.toFixed(2).replace(/0$/, "") + "초";
+      }
+
+      function loadChromaState() {
+        try {
+          var raw = localStorage.getItem(CHROMA_STORAGE_KEY);
+          if (!raw) return;
+          var saved = JSON.parse(raw);
+          if (saved && typeof saved === "object") {
+            chromaState.enabled = !!saved.enabled;
+            if (saved.color) chromaState.color = String(saved.color);
+          }
+        } catch (e) { /* ignore */ }
+      }
+
+      function saveChromaState() {
+        try {
+          localStorage.setItem(CHROMA_STORAGE_KEY, JSON.stringify(chromaState));
+        } catch (e) { /* ignore */ }
+      }
+
+      function applyChromaState() {
+        document.documentElement.classList.toggle("chroma-key", chromaState.enabled);
+        document.body.classList.toggle("chroma-key", chromaState.enabled);
+        document.documentElement.style.setProperty("--chroma-color", chromaState.color);
+      }
+    })();
+  </script>
+</body>
+</html>
